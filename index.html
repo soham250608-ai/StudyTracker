@@ -1611,6 +1611,24 @@ input{
 
 <body>
 
+<div id="debugError" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:#b91c1c;color:#fff;padding:14px;font:13px/1.4 monospace;white-space:pre-wrap;word-break:break-word;"></div>
+<script>
+(function(){
+  function showError(msg){
+    var box = document.getElementById('debugError');
+    if(box){ box.style.display = 'block'; box.textContent = 'ERROR: ' + msg; }
+  }
+  window.addEventListener('error', function(e){
+    showError((e.message||'Unknown error') + ' — line ' + e.lineno + ', file: ' + (e.filename||'inline'));
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    var r = e.reason;
+    var msg = (r && r.message) ? r.message : (typeof r === 'string' ? r : JSON.stringify(r));
+    showError('Promise error: ' + msg);
+  });
+})();
+</script>
+
 <div id="backgroundStage" aria-hidden="true">
   <div id="backgroundParallax">
     <div id="backgroundLayer"></div>
