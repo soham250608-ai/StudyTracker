@@ -1653,6 +1653,7 @@ input{
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
 
@@ -1690,14 +1691,6 @@ const YEARS = [
   "12th"
 ];
 
-const DB_NAME =
-  "StudyTrackerLocalDB";
-
-const DB_VERSION = 1;
-
-const STORE_NAME =
-  "app";
-
 const TRACKER_KEY =
   "tracker";
 
@@ -1705,207 +1698,71 @@ const BACKGROUND_KEY =
   "background";
 
 /* =========================================================
-   STATE
+   SUPABASE SYNC
    ========================================================= */
 
-let settings = {
-  title:"Study Tracker"
-};
+const SUPABASE_URL = "https://kzbtordzxlfppsgavkco.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6YnRvcmR6eGxmcHBzZ2F2a2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MDQyMDIsImV4cCI6MjEwNDk4MDIwMn0.aWIMj6yTjvU_8Q28BTrcSVsRTCYpAIxZ5dQlAOS7mBs";
 
-let state = {
-  view:"home",
-  subject:null,
-  year:null,
-  background:null,
-  data:{}
-};
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 
-let saveTimer = null;
+const SYNC_CODE_LOCAL_KEY = "study-tracker-sync-code";
 
-/* =========================================================
-   DATABASE
-   ========================================================= */
-
-function openDB(){
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      const request =
-        indexedDB.open(
-          DB_NAME,
-          DB_VERSION
-        );
-
-      request.onupgradeneeded =
-        function(){
-
-          const db =
-            request.result;
-
-          if(
-            !db.objectStoreNames.contains(
-              STORE_NAME
-            )
-          ){
-
-            db.createObjectStore(
-              STORE_NAME
-            );
-
-          }
-
-        };
-
-      request.onsuccess =
-        function(){
-
-          resolve(
-            request.result
-          );
-
-        };
-
-      request.onerror =
-        function(){
-
-          reject(
-            request.error
-          );
-
-        };
-
+function getSyncCode(){
+  let code = localStorage.getItem(SYNC_CODE_LOCAL_KEY);
+  if(!code){
+    code = prompt(
+      "Create a sync code for this tracker.\n\n" +
+      "Write this down exactly \u2014 you'll type this same code " +
+      "on your other devices to see the same data:"
+    );
+    if(!code || !code.trim()){
+      code = "code-" + Math.random().toString(36).slice(2,10);
+      alert("No code entered \u2014 generated one for you:\n\n" + code +
+        "\n\nWrite this down to use on your other devices.");
     }
-  );
-
+    code = code.trim().toLowerCase();
+    localStorage.setItem(SYNC_CODE_LOCAL_KEY, code);
+  }
+  return code;
 }
+
+const SYNC_CODE = getSyncCode();
 
 async function dbGet(key){
-
-  const db =
-    await openDB();
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      const tx =
-        db.transaction(
-          STORE_NAME,
-          "readonly"
-        );
-
-      const request =
-        tx
-          .objectStore(STORE_NAME)
-          .get(key);
-
-      request.onsuccess =
-        function(){
-
-          resolve(
-            request.result
-          );
-
-        };
-
-      request.onerror =
-        function(){
-
-          reject(
-            request.error
-          );
-
-        };
-
-    }
-  );
-
+  const { data, error } = await supabaseClient
+    .from("tracker_sync")
+    .select("payload, background")
+    .eq("sync_code", SYNC_CODE)
+    .maybeSingle();
+  if(error) throw error;
+  if(!data) return undefined;
+  if(key === TRACKER_KEY) return data.payload || undefined;
+  if(key === BACKGROUND_KEY) return data.background || undefined;
+  return undefined;
 }
 
-async function dbSet(
-  key,
-  value
-){
-
-  const db =
-    await openDB();
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      const tx =
-        db.transaction(
-          STORE_NAME,
-          "readwrite"
-        );
-
-      tx
-        .objectStore(STORE_NAME)
-        .put(
-          value,
-          key
-        );
-
-      tx.oncomplete =
-        function(){
-
-          resolve();
-
-        };
-
-      tx.onerror =
-        function(){
-
-          reject(
-            tx.error
-          );
-
-        };
-
-    }
-  );
-
+async function dbSet(key, value){
+  const patch = { sync_code: SYNC_CODE, updated_at: new Date().toISOString() };
+  if(key === TRACKER_KEY) patch.payload = value;
+  if(key === BACKGROUND_KEY) patch.background = value;
+  const { error } = await supabaseClient
+    .from("tracker_sync")
+    .upsert(patch, { onConflict: "sync_code" });
+  if(error) throw error;
 }
 
-async function dbDelete(
-  key
-){
-
-  const db =
-    await openDB();
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      const tx =
-        db.transaction(
-          STORE_NAME,
-          "readwrite"
-        );
-
-      tx
-        .objectStore(STORE_NAME)
-        .delete(key);
-
-      tx.oncomplete =
-        function(){
-
-          resolve();
-
-        };
-
-      tx.onerror =
-        function(){
-
-          reject(
-            tx.error
-          );
-
-        };
-
-    }
-  );
-
+async function dbDelete(key){
+  if(key === BACKGROUND_KEY){
+    const { error } = await supabaseClient
+      .from("tracker_sync")
+      .update({ background: null })
+      .eq("sync_code", SYNC_CODE);
+    if(error) throw error;
+  }
 }
 
 /* =========================================================
