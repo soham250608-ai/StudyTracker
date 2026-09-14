@@ -1,0 +1,11 @@
+{
+  "name": "Study Tracker",
+  "short_name": "Study Tracker",
+  "description": "Local study tracker for Physics, Maths, Chemistry and Biology.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f2ea",
+  "theme_color": "#f4f2ea"
+}
