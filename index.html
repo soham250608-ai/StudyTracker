@@ -1716,6 +1716,24 @@ const BACKGROUND_KEY =
   "background";
 
 /* =========================================================
+   STATE
+   ========================================================= */
+
+let settings = {
+  title:"Study Tracker"
+};
+
+let state = {
+  view:"home",
+  subject:null,
+  year:null,
+  background:null,
+  data:{}
+};
+
+let saveTimer = null;
+
+/* =========================================================
    SUPABASE SYNC
    ========================================================= */
 
