@@ -1,0 +1,5159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+
+<meta name="theme-color" content="#f4f2ea">
+
+<meta
+  name="apple-mobile-web-app-capable"
+  content="yes"
+>
+
+<meta
+  name="apple-mobile-web-app-status-bar-style"
+  content="default"
+>
+
+<meta
+  name="apple-mobile-web-app-title"
+  content="Study Tracker"
+>
+
+<title>Study Tracker</title>
+
+<link rel="manifest" href="./manifest.json">
+
+<style>
+
+:root{
+  --bg:#f4f2ea;
+  --paper:rgba(255,253,247,.92);
+
+  --ink:#232520;
+  --muted:#6b6d63;
+
+  --border:rgba(35,37,32,.14);
+  --border2:rgba(35,37,32,.28);
+
+  --physics:#3d5a80;
+  --maths:#d4a900;
+  --chemistry:#b94a48;
+  --biology:#4f8a5b;
+
+  --user-bg:none;
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body{
+  min-height:100%;
+  margin:0;
+}
+
+html{
+  background:var(--bg);
+}
+
+body{
+  color:var(--ink);
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+
+  background-color:var(--bg);
+
+  overscroll-behavior-x:none;
+}
+
+button,
+input{
+  font:inherit;
+}
+
+button{
+  -webkit-appearance:none;
+  appearance:none;
+  border-radius:0;
+}
+
+input{
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+/* =========================================================
+   FULL SCREEN BACKGROUND
+========================================================= */
+
+#backgroundLayer{
+  position:fixed;
+
+  inset:0;
+
+  width:100vw;
+
+  height:100vh;
+  height:100dvh;
+
+  min-height:100%;
+
+  z-index:0;
+
+  background-color:var(--bg);
+
+  background-position:center center;
+
+  background-size:cover;
+
+  background-repeat:no-repeat;
+
+  pointer-events:none;
+}
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app{
+  position:relative;
+
+  z-index:1;
+
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+.wrap{
+  width:min(1000px,100%);
+
+  margin:auto;
+
+  padding:
+    max(28px,env(safe-area-inset-top))
+    20px
+    max(70px,calc(40px + env(safe-area-inset-bottom)));
+}
+
+.display{
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+}
+
+.mono{
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+}
+
+/* =========================================================
+   TOP
+========================================================= */
+
+.topbar{
+  margin-bottom:25px;
+}
+
+.brand{
+  font:
+    600 34px
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+
+  margin:0;
+
+  outline:0;
+
+  border-radius:8px;
+
+  padding:2px 6px;
+
+  margin-left:-6px;
+}
+
+.brand:hover,
+.brand:focus{
+  background:rgba(255,253,247,.78);
+
+  box-shadow:
+    0 4px 15px
+    rgba(35,37,32,.08);
+}
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats{
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  background:var(--paper);
+
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+
+  border:1px solid var(--border2);
+
+  border-radius:16px;
+
+  overflow:hidden;
+
+  margin:20px 0 27px;
+
+  box-shadow:
+    0 9px 25px
+    rgba(35,37,32,.07);
+}
+
+.stat{
+  padding:16px;
+
+  border-right:1px solid var(--border);
+
+  transition:.2s;
+}
+
+.stat:last-child{
+  border-right:0;
+}
+
+.stat-num{
+  font:
+    600 28px
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+
+  line-height:1.15;
+}
+
+.stat-label{
+  font-size:12px;
+
+  color:var(--muted);
+
+  margin-top:4px;
+}
+
+/* =========================================================
+   PAGE ANIMATION
+========================================================= */
+
+.page-enter{
+  animation:
+    pageEnter
+    .35s
+    cubic-bezier(.2,.8,.2,1)
+    both;
+}
+
+@keyframes pageEnter{
+
+  from{
+    opacity:0;
+
+    transform:
+      translateY(12px);
+  }
+
+  to{
+    opacity:1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+
+/* =========================================================
+   POP
+========================================================= */
+
+.pop-target{
+  animation:
+    tabPop
+    .18s
+    cubic-bezier(.2,.9,.25,1)
+    both !important;
+
+  transform-origin:center center;
+
+  will-change:transform;
+}
+
+@keyframes tabPop{
+
+  0%{
+    transform:scale(1);
+  }
+
+  45%{
+    transform:scale(.955);
+  }
+
+  100%{
+    transform:scale(1.025);
+  }
+
+}
+
+/* =========================================================
+   RIPPLE
+========================================================= */
+
+.ripple{
+  position:absolute;
+
+  left:0;
+  top:0;
+
+  width:20px;
+  height:20px;
+
+  border-radius:50%;
+
+  pointer-events:none;
+
+  background:var(--tint);
+
+  opacity:0;
+
+  transform:
+    translate3d(-50%,-50%,0)
+    scale(0);
+
+  transform-origin:center center;
+
+  z-index:1;
+
+  will-change:
+    transform,
+    opacity;
+
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+}
+
+/* =========================================================
+   HOME SUBJECT TILES
+========================================================= */
+
+.tiles{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:16px;
+}
+
+.tile{
+  --tint:var(--physics);
+
+  position:relative;
+
+  overflow:hidden;
+
+  isolation:isolate;
+
+  width:100%;
+
+  background:var(--paper);
+
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+
+  border:1px solid var(--border2);
+
+  border-left:
+    5px solid var(--tint);
+
+  border-radius:16px;
+
+  padding:22px;
+
+  text-align:left;
+
+  cursor:pointer;
+
+  color:var(--ink);
+
+  box-shadow:
+    0 9px 24px
+    rgba(35,37,32,.07);
+
+  transition:
+    transform .18s,
+    box-shadow .18s;
+
+  animation:
+    rise .45s both;
+
+  touch-action:manipulation;
+
+  -webkit-user-select:none;
+  user-select:none;
+}
+
+.tile>*{
+  position:relative;
+
+  z-index:2;
+}
+
+.tile::after{
+  content:"";
+
+  position:absolute;
+
+  width:155px;
+  height:155px;
+
+  border-radius:50%;
+
+  right:-70px;
+  top:-70px;
+
+  background:var(--tint);
+
+  opacity:.10;
+
+  transition:
+    transform .35s,
+    opacity .25s;
+}
+
+.tile:hover{
+  transform:
+    translateY(-5px)
+    scale(1.008);
+
+  box-shadow:
+    0 18px 35px
+    rgba(35,37,32,.13);
+}
+
+.tile:hover::after{
+  transform:scale(1.55);
+
+  opacity:.17;
+}
+
+.tile:active{
+  transform:scale(.985);
+}
+
+.tile-head{
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:10px;
+}
+
+.tile-name{
+  font:
+    600 23px
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+}
+
+.tile-pct{
+  font:
+    600 24px
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.tile-meta{
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:8px;
+
+  margin-top:10px;
+
+  color:var(--muted);
+
+  font:
+    12px
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+/* =========================================================
+   PROGRESS BAR
+========================================================= */
+
+.bar{
+  width:100%;
+
+  height:6px;
+
+  margin-top:15px;
+
+  background:
+    rgba(35,37,32,.09);
+
+  border-radius:999px;
+
+  overflow:hidden;
+}
+
+.bar>div{
+  height:100%;
+
+  width:0;
+
+  background:var(--tint);
+
+  border-radius:999px;
+
+  transition:
+    width .25s
+    cubic-bezier(.2,.8,.2,1);
+}
+
+/* =========================================================
+   HEADER TABS
+   ONLY ADDITIONAL UI CHANGE REQUESTED
+========================================================= */
+
+.header-tab{
+  display:inline-block;
+
+  width:max-content;
+
+  max-width:100%;
+
+  background:
+    rgba(255,253,247,.94);
+
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+
+  border:
+    1px solid
+    rgba(35,37,32,.20);
+
+  border-radius:13px;
+
+  box-shadow:
+    0 7px 20px
+    rgba(35,37,32,.07);
+
+  padding:9px 14px;
+}
+
+.back-tab{
+  margin-bottom:10px;
+}
+
+.title-tab{
+  margin-bottom:0;
+}
+
+.back{
+  display:block;
+
+  border:0;
+
+  background:transparent;
+
+  color:var(--muted);
+
+  font:
+    600 22px
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+
+  line-height:1.2;
+
+  padding:0;
+
+  margin:0;
+
+  cursor:pointer;
+
+  touch-action:manipulation;
+}
+
+.back:hover{
+  color:var(--ink);
+}
+
+.subject-head{
+  --tint:var(--physics);
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:end;
+}
+
+.subject-title{
+  margin:0;
+
+  font:
+    600 32px
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+
+  color:var(--tint);
+}
+
+/* =========================================================
+   YEAR TABS
+========================================================= */
+
+.year-tabs{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:16px;
+
+  margin:20px 0;
+}
+
+.year-tab{
+  position:relative;
+
+  overflow:hidden;
+
+  isolation:isolate;
+
+  --tint:var(--physics);
+
+  width:100%;
+
+  background:var(--paper);
+
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+
+  border:1px solid var(--border2);
+
+  border-top:
+    5px solid var(--tint);
+
+  border-radius:15px;
+
+  padding:20px;
+
+  text-align:left;
+
+  cursor:pointer;
+
+  color:var(--ink);
+
+  box-shadow:
+    0 9px 24px
+    rgba(35,37,32,.07);
+
+  transition:
+    transform .23s,
+    box-shadow .23s;
+
+  animation:
+    rise .4s both;
+
+  touch-action:manipulation;
+
+  -webkit-user-select:none;
+  user-select:none;
+}
+
+.year-tab>*{
+  position:relative;
+
+  z-index:2;
+}
+
+.year-tab::after{
+  content:"";
+
+  position:absolute;
+
+  width:130px;
+  height:130px;
+
+  border-radius:50%;
+
+  right:-65px;
+  top:-65px;
+
+  background:var(--tint);
+
+  opacity:.10;
+
+  transition:
+    transform .35s,
+    opacity .25s;
+}
+
+.year-tab:hover{
+  transform:
+    translateY(-5px)
+    scale(1.008);
+
+  box-shadow:
+    0 18px 35px
+    rgba(35,37,32,.13);
+}
+
+.year-tab:hover::after{
+  transform:scale(1.55);
+
+  opacity:.17;
+}
+
+.year-tab:active{
+  transform:scale(.985);
+}
+
+.year-name{
+  font:
+    600 22px
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+}
+
+.year-pct{
+  float:right;
+
+  font:
+    600 24px
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.year-meta{
+  display:block;
+
+  color:var(--muted);
+
+  font:
+    12px
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+
+  margin-top:11px;
+}
+
+/* =========================================================
+   ADD ROW
+========================================================= */
+
+.add-row{
+  display:flex;
+
+  justify-content:flex-end;
+
+  margin:20px 0 14px;
+}
+
+.plus-button{
+  --tint:var(--physics);
+
+  width:44px;
+  height:44px;
+
+  position:relative;
+
+  overflow:hidden;
+
+  border:1px solid var(--border2);
+
+  border-radius:13px;
+
+  background:var(--paper);
+
+  color:var(--tint);
+
+  font:
+    500 27px
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+
+  line-height:1;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 8px 20px
+    rgba(35,37,32,.07);
+
+  touch-action:manipulation;
+}
+
+.plus-button:active{
+  transform:scale(.95);
+}
+
+/* =========================================================
+   CHAPTER GRID
+========================================================= */
+
+.chapters{
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:16px;
+}
+
+/* =========================================================
+   CHAPTER CARD
+========================================================= */
+
+.chapter{
+  --tint:var(--physics);
+
+  position:relative;
+
+  overflow:hidden;
+
+  background:var(--paper);
+
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+
+  border:1px solid var(--border2);
+
+  border-top:
+    4px solid var(--tint);
+
+  border-radius:15px;
+
+  padding:16px;
+
+  box-shadow:
+    0 9px 24px
+    rgba(35,37,32,.07);
+
+  animation:
+    rise .4s both;
+}
+
+.chapter-head{
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-start;
+
+  gap:10px;
+}
+
+.chapter-title{
+  font:
+    600 17px
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+
+  line-height:1.25;
+
+  overflow-wrap:anywhere;
+}
+
+.chapter-actions{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:9px;
+
+  margin-top:8px;
+}
+
+.linkbtn{
+  border:0;
+
+  background:transparent;
+
+  color:var(--muted);
+
+  font-size:11px;
+
+  padding:0;
+
+  cursor:pointer;
+}
+
+.linkbtn:hover{
+  color:var(--ink);
+}
+
+.chapter-progress{
+  flex:none;
+
+  font:
+    600 16px
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.row-label{
+  color:var(--muted);
+
+  font-size:10px;
+
+  margin-top:13px;
+
+  margin-bottom:7px;
+
+  letter-spacing:.02em;
+}
+
+.dots{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:6px;
+}
+
+.dot{
+  width:30px;
+  height:30px;
+
+  border-radius:50%;
+
+  border:
+    1px solid
+    var(--border2);
+
+  background:
+    rgba(255,255,255,.72);
+
+  color:var(--ink);
+
+  display:grid;
+
+  place-items:center;
+
+  font:
+    500 10px
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+
+  cursor:pointer;
+
+  transition:
+    transform .12s,
+    background .12s,
+    color .12s,
+    border-color .12s;
+
+  touch-action:manipulation;
+}
+
+.dot.done{
+  background:var(--tint);
+
+  border-color:var(--tint);
+
+  color:#fff;
+}
+
+.dot:active{
+  transform:scale(.90);
+}
+
+.stars{
+  display:flex;
+
+  gap:2px;
+}
+
+.star{
+  border:0;
+
+  background:transparent;
+
+  padding:0;
+
+  color:
+    rgba(35,37,32,.22);
+
+  font-size:23px;
+
+  line-height:1;
+
+  cursor:pointer;
+
+  transition:
+    color .12s,
+    transform .12s;
+}
+
+.star.on{
+  color:var(--tint);
+}
+
+.star:active{
+  transform:scale(.88);
+}
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty{
+  background:var(--paper);
+
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+
+  border:1px solid var(--border2);
+
+  border-radius:15px;
+
+  padding:20px;
+
+  color:var(--muted);
+
+  font-size:13px;
+
+  box-shadow:
+    0 9px 24px
+    rgba(35,37,32,.07);
+}
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+.settings-panel{
+  position:fixed;
+
+  inset:0;
+
+  z-index:50;
+
+  display:none;
+
+  align-items:flex-end;
+
+  justify-content:center;
+
+  padding:
+    14px
+    14px
+    max(14px,env(safe-area-inset-bottom));
+
+  background:
+    rgba(0,0,0,.25);
+}
+
+.settings-panel.open{
+  display:flex;
+}
+
+.settings-card{
+  width:min(560px,100%);
+
+  max-height:88vh;
+
+  overflow:auto;
+
+  background:
+    rgba(255,253,247,.98);
+
+  border-radius:20px;
+
+  padding:20px;
+
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,.20);
+}
+
+.settings-head{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  margin-bottom:18px;
+}
+
+.settings-title{
+  font-size:20px;
+
+  font-weight:600;
+}
+
+.settings-sub{
+  color:var(--muted);
+
+  font-size:12px;
+
+  margin-top:3px;
+}
+
+.settings-icon{
+  font-size:22px;
+}
+
+.settings-actions{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:9px;
+}
+
+.ghost{
+  border:
+    1px solid
+    var(--border2);
+
+  background:
+    rgba(255,255,255,.8);
+
+  color:var(--ink);
+
+  border-radius:11px;
+
+  padding:12px;
+
+  cursor:pointer;
+
+  font-size:12px;
+}
+
+.ghost:active{
+  transform:scale(.98);
+}
+
+.ghost.danger{
+  color:#a04444;
+
+  border-color:
+    rgba(160,68,68,.28);
+}
+
+.hidden-file{
+  display:none;
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes rise{
+
+  from{
+    opacity:0;
+
+    transform:
+      translateY(10px);
+  }
+
+  to{
+    opacity:1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:650px){
+
+  .wrap{
+    width:min(1000px,100%);
+
+    padding:
+      max(22px,env(safe-area-inset-top))
+      12px
+      max(60px,calc(35px + env(safe-area-inset-bottom)));
+  }
+
+  .brand{
+    font-size:30px;
+  }
+
+  .stats{
+    grid-template-columns:
+      repeat(2,1fr);
+
+    margin-top:17px;
+
+    margin-bottom:22px;
+  }
+
+  .stat{
+    padding:13px;
+  }
+
+  .stat:nth-child(1),
+  .stat:nth-child(2){
+    border-bottom:
+      1px solid
+      var(--border);
+  }
+
+  .stat:nth-child(2){
+    border-right:0;
+  }
+
+  .stat:nth-child(3){
+    border-right:
+      1px solid
+      var(--border);
+  }
+
+  .stat-num{
+    font-size:27px;
+  }
+
+  .stat-label{
+    font-size:10px;
+  }
+
+  .tiles{
+    grid-template-columns:
+      1fr 1fr;
+
+    gap:11px;
+  }
+
+  .tile{
+    padding:16px;
+
+    border-radius:14px;
+  }
+
+  .tile-name{
+    font-size:19px;
+  }
+
+  .tile-pct{
+    font-size:18px;
+  }
+
+  .tile-meta{
+    display:block;
+
+    font-size:9px;
+
+    line-height:1.7;
+  }
+
+  .year-tabs{
+    gap:10px;
+
+    margin:16px 0;
+  }
+
+  .year-tab{
+    padding:15px;
+
+    border-radius:13px;
+  }
+
+  .year-name{
+    font-size:18px;
+  }
+
+  .year-pct{
+    font-size:19px;
+  }
+
+  .year-meta{
+    font-size:9px;
+
+    margin-top:8px;
+  }
+
+  .subject-title{
+    font-size:25px;
+  }
+
+  .back{
+    font-size:21px;
+  }
+
+  .header-tab{
+    padding:8px 12px;
+
+    border-radius:12px;
+  }
+
+  .chapters{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+    gap:11px;
+  }
+
+  .chapter{
+    padding:13px;
+
+    border-radius:13px;
+  }
+
+  .chapter-title{
+    font-size:15px;
+  }
+
+  .chapter-progress{
+    font-size:14px;
+  }
+
+  .chapter-actions{
+    gap:6px;
+
+    margin-top:6px;
+  }
+
+  .linkbtn{
+    font-size:9px;
+  }
+
+  .row-label{
+    font-size:9px;
+
+    margin-top:11px;
+  }
+
+  .dots{
+    gap:5px;
+  }
+
+  .dot{
+    width:28px;
+    height:28px;
+
+    font-size:9px;
+  }
+
+  .star{
+    font-size:20px;
+  }
+
+  .settings-actions{
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media(max-width:370px){
+
+  .wrap{
+    padding-left:9px;
+    padding-right:9px;
+  }
+
+  .chapters{
+    gap:8px;
+  }
+
+  .chapter{
+    padding:10px;
+  }
+
+  .chapter-title{
+    font-size:14px;
+  }
+
+  .dot{
+    width:25px;
+    height:25px;
+
+    font-size:8px;
+  }
+
+  .star{
+    font-size:18px;
+  }
+
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms !important;
+
+    animation-iteration-count:1 !important;
+
+    transition-duration:.01ms !important;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- FULL SCREEN BACKGROUND -->
+<div
+  id="backgroundLayer"
+  aria-hidden="true"
+></div>
+
+<div class="app">
+
+  <div class="wrap">
+
+    <div id="app"></div>
+
+  </div>
+
+</div>
+
+<!-- =======================================================
+     SETTINGS
+======================================================= -->
+
+<div
+  class="settings-panel"
+  id="settingsPanel"
+>
+
+  <div class="settings-card">
+
+    <div class="settings-head">
+
+      <div>
+
+        <div class="settings-title">
+          Settings
+        </div>
+
+        <div class="settings-sub">
+          Background and data
+        </div>
+
+      </div>
+
+      <span class="settings-icon">
+        ✦
+      </span>
+
+    </div>
+
+    <div class="settings-actions">
+
+      <button
+        class="ghost"
+        id="bgBtn"
+        type="button"
+      >
+        Change background
+      </button>
+
+      <button
+        class="ghost"
+        id="clearBg"
+        type="button"
+      >
+        Clear background
+      </button>
+
+      <button
+        class="ghost"
+        id="export"
+        type="button"
+      >
+        Export backup
+      </button>
+
+      <button
+        class="ghost"
+        id="import"
+        type="button"
+      >
+        Import backup
+      </button>
+
+      <button
+        class="ghost danger"
+        id="reset"
+        type="button"
+        style="grid-column:1/-1"
+      >
+        Reset data
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<input
+  class="hidden-file"
+  type="file"
+  id="importFile"
+  accept=".json,application/json"
+>
+
+<input
+  class="hidden-file"
+  type="file"
+  id="bgFile"
+  accept="image/*"
+>
+
+<script>
+
+"use strict";
+
+/* =========================================================
+   DATABASE
+========================================================= */
+
+const DB_NAME =
+  "study-tracker-local";
+
+const DB_VERSION =
+  1;
+
+const TRACKER_KEY =
+  "tracker";
+
+const BACKGROUND_KEY =
+  "background";
+
+const STORE_NAME =
+  "state";
+
+/* =========================================================
+   SUBJECTS
+========================================================= */
+
+const SUBJECTS = [
+
+  {
+    key:"physics",
+    name:"Physics",
+    color:"var(--physics)"
+  },
+
+  {
+    key:"maths",
+    name:"Maths",
+    color:"var(--maths)"
+  },
+
+  {
+    key:"chemistry",
+    name:"Chemistry",
+    color:"var(--chemistry)"
+  },
+
+  {
+    key:"biology",
+    name:"Biology",
+    color:"var(--biology)"
+  }
+
+];
+
+const YEARS = [
+  "11th",
+  "12th"
+];
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let db = null;
+
+let settings = {
+  title:"Study Tracker"
+};
+
+let state = {
+
+  view:"home",
+
+  subject:null,
+
+  year:null,
+
+  background:null,
+
+  data:{}
+
+};
+
+let saveTimer = null;
+
+/* =========================================================
+   IDS
+========================================================= */
+
+function uid(){
+
+  return (
+    "id_" +
+    Date.now().toString(36) +
+    "_" +
+    Math.random()
+      .toString(36)
+      .slice(2,9)
+  );
+
+}
+
+/* =========================================================
+   DEFAULT DATA
+========================================================= */
+
+function blankData(){
+
+  const result = {};
+
+  SUBJECTS.forEach(
+    subject=>{
+
+      result[subject.key] = {
+
+        years:{
+
+          "11th":{
+            chapters:[]
+          },
+
+          "12th":{
+            chapters:[]
+          }
+
+        }
+
+      };
+
+    }
+  );
+
+  return result;
+
+}
+
+/* =========================================================
+   DATABASE OPEN
+========================================================= */
+
+function openDatabase(){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const request =
+        indexedDB.open(
+          DB_NAME,
+          DB_VERSION
+        );
+
+      request.onupgradeneeded =
+        event=>{
+
+          const database =
+            event.target.result;
+
+          if(
+            !database.objectStoreNames
+              .contains(STORE_NAME)
+          ){
+
+            database.createObjectStore(
+              STORE_NAME
+            );
+
+          }
+
+        };
+
+      request.onsuccess =
+        event=>{
+
+          db =
+            event.target.result;
+
+          resolve();
+
+        };
+
+      request.onerror =
+        ()=>{
+
+          reject(
+            request.error
+          );
+
+        };
+
+    }
+  );
+
+}
+
+/* =========================================================
+   DB GET
+========================================================= */
+
+function dbGet(key){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const transaction =
+        db.transaction(
+          STORE_NAME,
+          "readonly"
+        );
+
+      const store =
+        transaction.objectStore(
+          STORE_NAME
+        );
+
+      const request =
+        store.get(key);
+
+      request.onsuccess =
+        ()=>{
+          resolve(
+            request.result
+          );
+        };
+
+      request.onerror =
+        ()=>{
+          reject(
+            request.error
+          );
+        };
+
+    }
+  );
+
+}
+
+/* =========================================================
+   DB SET
+========================================================= */
+
+function dbSet(key,value){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const transaction =
+        db.transaction(
+          STORE_NAME,
+          "readwrite"
+        );
+
+      const store =
+        transaction.objectStore(
+          STORE_NAME
+        );
+
+      const request =
+        store.put(
+          value,
+          key
+        );
+
+      request.onsuccess =
+        ()=>{
+          resolve();
+        };
+
+      request.onerror =
+        ()=>{
+          reject(
+            request.error
+          );
+        };
+
+    }
+  );
+
+}
+
+/* =========================================================
+   DB DELETE
+========================================================= */
+
+function dbDelete(key){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const transaction =
+        db.transaction(
+          STORE_NAME,
+          "readwrite"
+        );
+
+      const store =
+        transaction.objectStore(
+          STORE_NAME
+        );
+
+      const request =
+        store.delete(key);
+
+      request.onsuccess =
+        ()=>{
+          resolve();
+        };
+
+      request.onerror =
+        ()=>{
+          reject(
+            request.error
+          );
+        };
+
+    }
+  );
+
+}
+
+/* =========================================================
+   NORMALIZE CHAPTER
+========================================================= */
+
+function normalizeChapter(
+  chapter
+){
+
+  const total =
+    Math.max(
+      0,
+      Number(
+        chapter.totalLectures ??
+        chapter.lectures ??
+        0
+      ) || 0
+    );
+
+  let completed =
+    Number(
+      chapter.completedLectures
+    );
+
+  /*
+    Newer format may store individual
+    completed lecture numbers.
+  */
+  if(
+    Array.isArray(
+      chapter.completed
+    )
+  ){
+
+    completed =
+      chapter.completed.length;
+
+  }
+
+  completed =
+    Math.max(
+      0,
+      Math.min(
+        total,
+        Number(completed) || 0
+      )
+    );
+
+  return {
+
+    id:
+      chapter.id ||
+      uid(),
+
+    name:
+      String(
+        chapter.name ||
+        chapter.title ||
+        "Chapter"
+      ),
+
+    totalLectures:
+      total,
+
+    completedLectures:
+      completed,
+
+    confidence:
+      Math.max(
+        0,
+        Math.min(
+          5,
+          Number(
+            chapter.confidence
+          ) || 0
+        )
+      )
+
+  };
+
+}
+
+/* =========================================================
+   NORMALIZE DATA
+========================================================= */
+
+function normalizeData(
+  incoming
+){
+
+  const fresh =
+    blankData();
+
+  if(
+    !incoming ||
+    typeof incoming !== "object"
+  ){
+
+    return fresh;
+
+  }
+
+  SUBJECTS.forEach(
+    subject=>{
+
+      const source =
+        incoming[
+          subject.key
+        ];
+
+      if(!source){
+        return;
+      }
+
+      YEARS.forEach(
+        year=>{
+
+          /*
+            Current direct-chapter format.
+          */
+
+          if(
+            source.years &&
+            source.years[year] &&
+            Array.isArray(
+              source.years[year]
+                .chapters
+            )
+          ){
+
+            fresh[
+              subject.key
+            ].years[
+              year
+            ].chapters =
+              source.years[
+                year
+              ].chapters.map(
+                normalizeChapter
+              );
+
+            return;
+
+          }
+
+          /*
+            Old unit format.
+            Flatten all unit chapters
+            into the year.
+          */
+
+          if(
+            source.years &&
+            source.years[year] &&
+            Array.isArray(
+              source.years[year]
+                .units
+            )
+          ){
+
+            const chapters = [];
+
+            source.years[
+              year
+            ].units.forEach(
+              unit=>{
+
+                if(
+                  Array.isArray(
+                    unit.chapters
+                  )
+                ){
+
+                  chapters.push(
+                    ...unit.chapters
+                      .map(
+                        normalizeChapter
+                      )
+                  );
+
+                }
+
+              }
+            );
+
+            fresh[
+              subject.key
+            ].years[
+              year
+            ].chapters =
+              chapters;
+
+          }
+
+        }
+      );
+
+      /*
+        Older flat chapter format.
+      */
+
+      if(
+        Array.isArray(
+          source.chapters
+        )
+      ){
+
+        fresh[
+          subject.key
+        ].years[
+          "11th"
+        ].chapters =
+          source.chapters.map(
+            normalizeChapter
+          );
+
+      }
+
+    }
+  );
+
+  return fresh;
+
+}
+
+/* =========================================================
+   LOAD
+========================================================= */
+
+async function load(){
+
+  state.data =
+    blankData();
+
+  try{
+
+    const stored =
+      await dbGet(
+        TRACKER_KEY
+      );
+
+    if(stored){
+
+      if(
+        stored.settings
+      ){
+
+        settings = {
+          ...settings,
+          ...stored.settings
+        };
+
+      }
+
+      if(
+        stored.data
+      ){
+
+        state.data =
+          normalizeData(
+            stored.data
+          );
+
+      }
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Could not load tracker data.",
+      error
+    );
+
+  }
+
+  try{
+
+    const background =
+      await dbGet(
+        BACKGROUND_KEY
+      );
+
+    if(background){
+
+      state.background =
+        background;
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Could not load background.",
+      error
+    );
+
+  }
+
+}
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+function save(){
+
+  clearTimeout(
+    saveTimer
+  );
+
+  saveTimer =
+    setTimeout(
+      async()=>{
+
+        try{
+
+          await dbSet(
+            TRACKER_KEY,
+            {
+              settings,
+              data:state.data
+            }
+          );
+
+        }catch(error){
+
+          console.error(
+            "Could not save tracker data.",
+            error
+          );
+
+        }
+
+      },
+      150
+    );
+
+}
+
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+function esc(value){
+
+  return String(
+    value
+  ).replace(
+    /[&<>"']/g,
+    character=>({
+
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      "\"":"&quot;",
+      "'":"&#039;"
+
+    })[
+      character
+    ]
+  );
+
+}
+
+/* =========================================================
+   ALL CHAPTERS
+========================================================= */
+
+function allChapters(
+  key,
+  year
+){
+
+  const result = [];
+
+  const years =
+    year
+      ? [year]
+      : YEARS;
+
+  const subject =
+    state.data[key];
+
+  if(
+    !subject ||
+    !subject.years
+  ){
+
+    return result;
+
+  }
+
+  years.forEach(
+    currentYear=>{
+
+      const chapters =
+        subject.years[
+          currentYear
+        ]?.chapters || [];
+
+      result.push(
+        ...chapters
+      );
+
+    }
+  );
+
+  return result;
+
+}
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function stats(
+  chapters
+){
+
+  let total = 0;
+
+  let done = 0;
+
+  let finished = 0;
+
+  let confidenceSum = 0;
+
+  let confidenceCount = 0;
+
+  chapters.forEach(
+    chapter=>{
+
+      const totalLectures =
+        Math.max(
+          0,
+          Number(
+            chapter.totalLectures
+          ) || 0
+        );
+
+      const completedLectures =
+        Math.min(
+          totalLectures,
+          Math.max(
+            0,
+            Number(
+              chapter.completedLectures
+            ) || 0
+          )
+        );
+
+      total +=
+        totalLectures;
+
+      done +=
+        completedLectures;
+
+      if(
+        totalLectures > 0 &&
+        completedLectures ===
+          totalLectures
+      ){
+
+        finished++;
+
+      }
+
+      if(
+        Number(
+          chapter.confidence
+        ) > 0
+      ){
+
+        confidenceSum +=
+          Number(
+            chapter.confidence
+          );
+
+        confidenceCount++;
+
+      }
+
+    }
+  );
+
+  return {
+
+    total,
+
+    done,
+
+    chapters:
+      chapters.length,
+
+    finished,
+
+    pct:
+      total
+        ? Math.round(
+            done /
+            total *
+            100
+          )
+        : 0,
+
+    avgConf:
+      confidenceCount
+        ? confidenceSum /
+          confidenceCount
+        : 0
+
+  };
+
+}
+
+/* =========================================================
+   OVERALL
+========================================================= */
+
+function overall(){
+
+  return stats(
+
+    SUBJECTS.flatMap(
+      subject=>
+        allChapters(
+          subject.key
+        )
+    )
+
+  );
+
+}
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+function applyBackground(){
+
+  const layer =
+    document.getElementById(
+      "backgroundLayer"
+    );
+
+  if(!layer){
+    return;
+  }
+
+  layer.style.backgroundImage =
+    state.background
+      ? `url("${state.background}")`
+      : "none";
+
+}
+
+/* =========================================================
+   EXPORT
+========================================================= */
+
+function exportData(){
+
+  const backup = {
+
+    version:2,
+
+    exportedAt:
+      new Date().toISOString(),
+
+    settings,
+
+    data:
+      state.data,
+
+    background:
+      state.background
+
+  };
+
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          backup,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+  const anchor =
+    document.createElement(
+      "a"
+    );
+
+  anchor.href =
+    url;
+
+  anchor.download =
+    "study-tracker-backup.json";
+
+  document.body.appendChild(
+    anchor
+  );
+
+  anchor.click();
+
+  anchor.remove();
+
+  setTimeout(
+    ()=>{
+      URL.revokeObjectURL(
+        url
+      );
+    },
+    100
+  );
+
+}
+
+/* =========================================================
+   IMPORT
+========================================================= */
+
+async function importData(
+  file
+){
+
+  const reader =
+    new FileReader();
+
+  reader.onload =
+    async()=>{
+
+      try{
+
+        const backup =
+          JSON.parse(
+            reader.result
+          );
+
+        if(
+          backup.settings
+        ){
+
+          settings = {
+            ...settings,
+            ...backup.settings
+          };
+
+        }
+
+        state.data =
+          normalizeData(
+            backup.data ||
+            backup
+          );
+
+        if(
+          typeof backup.background ===
+            "string"
+        ){
+
+          state.background =
+            backup.background;
+
+        }
+
+        await dbSet(
+          BACKGROUND_KEY,
+          state.background || null
+        );
+
+        await dbSet(
+          TRACKER_KEY,
+          {
+            settings,
+            data:state.data
+          }
+        );
+
+        applyBackground();
+
+        render();
+
+        alert(
+          "Backup imported successfully."
+        );
+
+      }catch(error){
+
+        console.error(
+          error
+        );
+
+        alert(
+          "Invalid backup file."
+        );
+
+      }
+
+    };
+
+  reader.readAsText(
+    file
+  );
+
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+async function resetAll(){
+
+  const confirmed =
+    confirm(
+      "Delete all study data?"
+    );
+
+  if(!confirmed){
+    return;
+  }
+
+  state.data =
+    blankData();
+
+  state.view =
+    "home";
+
+  state.subject =
+    null;
+
+  state.year =
+    null;
+
+  await dbSet(
+    TRACKER_KEY,
+    {
+      settings,
+      data:state.data
+    }
+  );
+
+  render();
+
+}
+
+/* =========================================================
+   RIPPLE
+========================================================= */
+
+function createRipple(
+  element,
+  event
+){
+
+  if(!element){
+    return;
+  }
+
+  const rect =
+    element.getBoundingClientRect();
+
+  const ripple =
+    document.createElement(
+      "span"
+    );
+
+  ripple.className =
+    "ripple";
+
+  ripple.style.left =
+    (
+      event
+        ? event.clientX - rect.left
+        : rect.width / 2
+    ) + "px";
+
+  ripple.style.top =
+    (
+      event
+        ? event.clientY - rect.top
+        : rect.height / 2
+    ) + "px";
+
+  element.appendChild(
+    ripple
+  );
+
+  const start =
+    performance.now();
+
+  const duration =
+    420;
+
+  function frame(now){
+
+    const progress =
+      Math.min(
+        1,
+        (now-start) /
+        duration
+      );
+
+    const eased =
+      1 -
+      Math.pow(
+        1-progress,
+        3
+      );
+
+    ripple.style.transform =
+      `
+        translate3d(-50%,-50%,0)
+        scale(${4.5*eased})
+      `;
+
+    ripple.style.opacity =
+      String(
+        .24 *
+        (1-progress)
+      );
+
+    if(
+      progress < 1
+    ){
+
+      requestAnimationFrame(
+        frame
+      );
+
+    }else{
+
+      ripple.remove();
+
+    }
+
+  }
+
+  requestAnimationFrame(
+    frame
+  );
+
+}
+
+/* =========================================================
+   POP
+========================================================= */
+
+function playPop(
+  element
+){
+
+  if(!element){
+    return;
+  }
+
+  element.classList.remove(
+    "pop-target"
+  );
+
+  void element.offsetWidth;
+
+  element.classList.add(
+    "pop-target"
+  );
+
+  setTimeout(
+    ()=>{
+      element.classList.remove(
+        "pop-target"
+      );
+    },
+    220
+  );
+
+}
+
+/* =========================================================
+   SHELL
+========================================================= */
+
+function shell(
+  content
+){
+
+  return `
+
+    <div class="topbar">
+
+      <h1
+        id="brand"
+        class="brand display"
+        contenteditable="true"
+        spellcheck="false"
+      >
+        ${esc(settings.title)}
+      </h1>
+
+    </div>
+
+    ${content}
+
+  `;
+
+}
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function home(){
+
+  const x =
+    overall();
+
+  return shell(`
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.pct}%
+        </div>
+
+        <div class="stat-label">
+          overall completion
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.done}/${x.total}
+        </div>
+
+        <div class="stat-label">
+          lectures completed / total
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.finished}/${x.chapters}
+        </div>
+
+        <div class="stat-label">
+          chapters completed / total
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${
+            x.avgConf
+              ? x.avgConf.toFixed(1)
+              : "—"
+          } / 5
+        </div>
+
+        <div class="stat-label">
+          avg. confidence
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="tiles">
+
+      ${SUBJECTS.map(
+        (subject,index)=>{
+
+          const z =
+            stats(
+              allChapters(
+                subject.key
+              )
+            );
+
+          return `
+
+            <button
+              class="tile"
+              data-subject="${esc(subject.key)}"
+              style="
+                --tint:${subject.color};
+                animation-delay:${index*.06}s
+              "
+              type="button"
+            >
+
+              <div class="tile-head">
+
+                <span class="tile-name">
+                  ${esc(subject.name)}
+                </span>
+
+                <span class="tile-pct">
+                  ${z.pct}%
+                </span>
+
+              </div>
+
+              <div class="bar">
+
+                <div
+                  style="
+                    width:${z.pct}%
+                  "
+                ></div>
+
+              </div>
+
+              <div class="tile-meta">
+
+                <span>
+                  ${z.done}/${z.total}
+                  lectures
+                </span>
+
+                <span>
+                  ${z.finished}/${z.chapters}
+                  chapters
+                </span>
+
+              </div>
+
+            </button>
+
+          `;
+
+        }
+      ).join("")}
+
+    </div>
+
+  `);
+
+}
+
+/* =========================================================
+   SUBJECT PAGE
+========================================================= */
+
+function subjectPage(
+  key
+){
+
+  const subject =
+    SUBJECTS.find(
+      item =>
+        item.key === key
+    );
+
+  if(!subject){
+
+    state.view =
+      "home";
+
+    return home();
+
+  }
+
+  const x =
+    stats(
+      allChapters(key)
+    );
+
+  return shell(`
+
+    <div class="header-tab back-tab">
+
+      <button
+        class="back"
+        id="back"
+        type="button"
+      >
+        ← All subjects
+      </button>
+
+    </div>
+
+    <div
+      class="header-tab title-tab"
+      style="
+        border-color:
+          ${subject.color};
+      "
+    >
+
+      <div
+        class="subject-head"
+        style="--tint:${subject.color}"
+      >
+
+        <h2 class="subject-title">
+          ${esc(subject.name)}
+        </h2>
+
+      </div>
+
+    </div>
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.pct}%
+        </div>
+
+        <div class="stat-label">
+          overall completion
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.done}/${x.total}
+        </div>
+
+        <div class="stat-label">
+          lectures
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.finished}/${x.chapters}
+        </div>
+
+        <div class="stat-label">
+          chapters complete
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${
+            x.avgConf
+              ? x.avgConf.toFixed(1)
+              : "—"
+          } / 5
+        </div>
+
+        <div class="stat-label">
+          avg. confidence
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      class="year-tabs"
+      style="--tint:${subject.color}"
+    >
+
+      ${YEARS.map(
+        (year,index)=>{
+
+          const z =
+            stats(
+              allChapters(
+                key,
+                year
+              )
+            );
+
+          return `
+
+            <button
+              class="year-tab"
+              data-year="${esc(year)}"
+              style="
+                --tint:${subject.color};
+                animation-delay:${index*.08}s
+              "
+              type="button"
+            >
+
+              <span class="year-name">
+                ${esc(year)}
+              </span>
+
+              <span class="year-pct">
+                ${z.pct}%
+              </span>
+
+              <span class="year-meta">
+                ${z.done}/${z.total}
+                lectures ·
+                ${z.chapters}
+                chapters
+              </span>
+
+            </button>
+
+          `;
+
+        }
+      ).join("")}
+
+    </div>
+
+  `);
+
+}
+
+/* =========================================================
+   CHAPTER CARD
+========================================================= */
+
+function chapterCard(
+  subject,
+  chapter,
+  index
+){
+
+  const total =
+    Math.max(
+      0,
+      Number(
+        chapter.totalLectures
+      ) || 0
+    );
+
+  const completed =
+    Math.min(
+      total,
+      Math.max(
+        0,
+        Number(
+          chapter.completedLectures
+        ) || 0
+      )
+    );
+
+  const pct =
+    total
+      ? Math.round(
+          completed /
+          total *
+          100
+        )
+      : 0;
+
+  const dots =
+    Array.from(
+      {
+        length:total
+      },
+      (_,i)=>{
+
+        const number =
+          i+1;
+
+        return `
+
+          <button
+            class="
+              dot
+              ${
+                number <= completed
+                  ? "done"
+                  : ""
+              }
+            "
+            data-action="lecture"
+            data-id="${esc(chapter.id)}"
+            data-index="${i}"
+            title="Lecture ${number}"
+            type="button"
+          >
+            ${number}
+          </button>
+
+        `;
+
+      }
+    ).join("");
+
+  const stars =
+    Array.from(
+      {
+        length:5
+      },
+      (_,i)=>{
+
+        const value =
+          i+1;
+
+        return `
+
+          <button
+            class="
+              star
+              ${
+                value <=
+                chapter.confidence
+                  ? "on"
+                  : ""
+              }
+            "
+            data-action="confidence"
+            data-id="${esc(chapter.id)}"
+            data-value="${value}"
+            title="${value}/5"
+            type="button"
+          >
+            ★
+          </button>
+
+        `;
+
+      }
+    ).join("");
+
+  return `
+
+    <div
+      class="chapter"
+      data-chapter="${esc(chapter.id)}"
+      style="
+        --tint:${subject.color};
+        animation-delay:${(index||0)*.04}s
+      "
+    >
+
+      <div class="chapter-head">
+
+        <div>
+
+          <div class="chapter-title">
+            ${esc(chapter.name)}
+          </div>
+
+          <div class="chapter-actions">
+
+            <button
+              class="linkbtn"
+              data-action="rename"
+              data-id="${esc(chapter.id)}"
+              type="button"
+            >
+              rename
+            </button>
+
+            <button
+              class="linkbtn"
+              data-action="edit-total"
+              data-id="${esc(chapter.id)}"
+              type="button"
+            >
+              edit lectures
+            </button>
+
+            <button
+              class="linkbtn"
+              data-action="delete"
+              data-id="${esc(chapter.id)}"
+              type="button"
+            >
+              delete
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="chapter-progress">
+
+          ${completed}/${total}
+
+        </div>
+
+      </div>
+
+      <div class="bar">
+
+        <div
+          style="
+            width:${pct}%;
+            background:${subject.color}
+          "
+        ></div>
+
+      </div>
+
+      <div class="row-label">
+
+        Lecture progress · ${pct}%
+
+      </div>
+
+      <div class="dots">
+
+        ${dots}
+
+      </div>
+
+      <div class="row-label">
+
+        Confidence ·
+        ${
+          chapter.confidence
+            ? chapter.confidence + "/5"
+            : "Not rated"
+        }
+
+      </div>
+
+      <div class="stars">
+
+        ${stars}
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+/* =========================================================
+   YEAR PAGE
+========================================================= */
+
+function yearPage(
+  key,
+  year
+){
+
+  const subject =
+    SUBJECTS.find(
+      item =>
+        item.key === key
+    );
+
+  if(!subject){
+
+    state.view =
+      "home";
+
+    return home();
+
+  }
+
+  const yearData =
+    state.data[key]
+      ?.years?.[year];
+
+  if(!yearData){
+
+    state.view =
+      "subject";
+
+    return subjectPage(
+      key
+    );
+
+  }
+
+  const x =
+    stats(
+      allChapters(
+        key,
+        year
+      )
+    );
+
+  return shell(`
+
+    <div class="header-tab back-tab">
+
+      <button
+        class="back"
+        id="back"
+        type="button"
+      >
+        ← ${esc(subject.name)}
+      </button>
+
+    </div>
+
+    <div
+      class="header-tab title-tab"
+      style="
+        border-color:
+          ${subject.color};
+      "
+    >
+
+      <div
+        class="subject-head"
+        style="--tint:${subject.color}"
+      >
+
+        <h2 class="subject-title">
+
+          ${esc(subject.name)}
+          ·
+          ${esc(year)}
+
+        </h2>
+
+      </div>
+
+    </div>
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.pct}%
+        </div>
+
+        <div class="stat-label">
+          completion
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.done}/${x.total}
+        </div>
+
+        <div class="stat-label">
+          lectures
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${x.finished}/${x.chapters}
+        </div>
+
+        <div class="stat-label">
+          chapters complete
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="stat-num">
+          ${
+            x.avgConf
+              ? x.avgConf.toFixed(1)
+              : "—"
+          } / 5
+        </div>
+
+        <div class="stat-label">
+          avg. confidence
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="add-row">
+
+      <button
+        class="plus-button"
+        id="addChapterButton"
+        style="--tint:${subject.color}"
+        type="button"
+        aria-label="Add chapter"
+        title="Add chapter"
+      >
+        +
+      </button>
+
+    </div>
+
+    <div class="chapters">
+
+      ${
+        yearData.chapters.length
+
+          ? yearData.chapters
+              .map(
+                (chapter,index)=>
+                  chapterCard(
+                    subject,
+                    chapter,
+                    index
+                  )
+              )
+              .join("")
+
+          : `
+              <div class="empty">
+
+                Tap + above to add a chapter.
+
+              </div>
+            `
+      }
+
+    </div>
+
+  `);
+
+}
+
+/* =========================================================
+   CHAPTER LIVE UPDATE
+========================================================= */
+
+function updateChapterCard(
+  card,
+  chapter
+){
+
+  if(
+    !card ||
+    !chapter
+  ){
+
+    return;
+
+  }
+
+  const total =
+    Math.max(
+      0,
+      Number(
+        chapter.totalLectures
+      ) || 0
+    );
+
+  const completed =
+    Math.min(
+      total,
+      Math.max(
+        0,
+        Number(
+          chapter.completedLectures
+        ) || 0
+      )
+    );
+
+  const pct =
+    total
+      ? Math.round(
+          completed /
+          total *
+          100
+        )
+      : 0;
+
+  const progress =
+    card.querySelector(
+      ".chapter-progress"
+    );
+
+  if(progress){
+
+    progress.textContent =
+      `${completed}/${total}`;
+
+  }
+
+  const bar =
+    card.querySelector(
+      ".bar > div"
+    );
+
+  if(bar){
+
+    bar.style.width =
+      `${pct}%`;
+
+  }
+
+  const label =
+    card.querySelector(
+      ".row-label"
+    );
+
+  if(label){
+
+    label.textContent =
+      `Lecture progress · ${pct}%`;
+
+  }
+
+  card
+    .querySelectorAll(
+      '.dot[data-action="lecture"]'
+    )
+    .forEach(
+      dot=>{
+
+        const index =
+          Number(
+            dot.dataset.index
+          );
+
+        dot.classList.toggle(
+          "done",
+          index < completed
+        );
+
+      }
+    );
+
+  card
+    .querySelectorAll(
+      '.star[data-action="confidence"]'
+    )
+    .forEach(
+      star=>{
+
+        star.classList.toggle(
+          "on",
+          Number(
+            star.dataset.value
+          ) <=
+          chapter.confidence
+        );
+
+      }
+    );
+
+  const labels =
+    card.querySelectorAll(
+      ".row-label"
+    );
+
+  if(labels[1]){
+
+    labels[1].textContent =
+      `
+        Confidence ·
+        ${
+          chapter.confidence
+            ? chapter.confidence + "/5"
+            : "Not rated"
+        }
+      `;
+
+  }
+
+}
+
+/* =========================================================
+   LIVE YEAR STATS
+   IMPORTANT:
+   Reads the visible chapter cards so the numbers
+   change immediately without re-rendering the page.
+========================================================= */
+
+function updateVisibleStats(){
+
+  if(
+    state.view !== "year"
+  ){
+
+    return;
+
+  }
+
+  const statsElement =
+    document.querySelector(
+      ".stats"
+    );
+
+  if(!statsElement){
+
+    return;
+
+  }
+
+  const cards =
+    Array.from(
+      document.querySelectorAll(
+        ".chapter"
+      )
+    );
+
+  let total = 0;
+
+  let done = 0;
+
+  let finished = 0;
+
+  let confidenceSum = 0;
+
+  let confidenceCount = 0;
+
+  cards.forEach(
+    card=>{
+
+      const progress =
+        card.querySelector(
+          ".chapter-progress"
+        );
+
+      if(progress){
+
+        const match =
+          progress.textContent
+            .trim()
+            .match(
+              /^(\d+)\s*\/\s*(\d+)$/
+            );
+
+        if(match){
+
+          const completed =
+            Number(match[1]);
+
+          const lectures =
+            Number(match[2]);
+
+          total +=
+            lectures;
+
+          done +=
+            Math.min(
+              completed,
+              lectures
+            );
+
+          if(
+            lectures > 0 &&
+            completed === lectures
+          ){
+
+            finished++;
+
+          }
+
+        }
+
+      }
+
+      const stars =
+        card.querySelectorAll(
+          ".star.on"
+        );
+
+      if(
+        stars.length > 0
+      ){
+
+        confidenceSum +=
+          stars.length;
+
+        confidenceCount++;
+
+      }
+
+    }
+  );
+
+  const pct =
+    total
+      ? Math.round(
+          done /
+          total *
+          100
+        )
+      : 0;
+
+  const avgConf =
+    confidenceCount
+      ? confidenceSum /
+        confidenceCount
+      : 0;
+
+  const values =
+    statsElement.querySelectorAll(
+      ".stat-num"
+    );
+
+  if(values[0]){
+
+    values[0].textContent =
+      `${pct}%`;
+
+  }
+
+  if(values[1]){
+
+    values[1].textContent =
+      `${done}/${total}`;
+
+  }
+
+  if(values[2]){
+
+    values[2].textContent =
+      `${finished}/${cards.length}`;
+
+  }
+
+  if(values[3]){
+
+    values[3].textContent =
+      `${
+        avgConf
+          ? avgConf.toFixed(1)
+          : "—"
+      } / 5`;
+
+  }
+
+}
+
+/* =========================================================
+   CHAPTER MODAL
+========================================================= */
+
+function createChapterModal(){
+
+  const existing =
+    document.getElementById(
+      "chapterModal"
+    );
+
+  if(existing){
+
+    existing.remove();
+
+  }
+
+  const subject =
+    SUBJECTS.find(
+      item =>
+        item.key ===
+        state.subject
+    );
+
+  const modal =
+    document.createElement(
+      "div"
+    );
+
+  modal.id =
+    "chapterModal";
+
+  modal.style.cssText = `
+
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.25);
+
+  `;
+
+  modal.innerHTML = `
+
+    <div
+      style="
+        width:min(420px,100%);
+        background:rgba(255,253,247,.98);
+        border:1px solid rgba(35,37,32,.18);
+        border-radius:18px;
+        padding:20px;
+        box-shadow:0 20px 60px rgba(0,0,0,.20);
+      "
+    >
+
+      <div
+        style="
+          font-size:18px;
+          font-weight:600;
+          margin-bottom:14px;
+        "
+      >
+        Add chapter
+      </div>
+
+      <input
+        id="modalChapterName"
+        type="text"
+        placeholder="Chapter name"
+        autocomplete="off"
+        maxlength="120"
+        style="
+          width:100%;
+          border:1px solid rgba(35,37,32,.22);
+          border-radius:10px;
+          padding:12px;
+          outline:none;
+          background:#fff;
+          margin-bottom:9px;
+        "
+      >
+
+      <input
+        id="modalLectureTotal"
+        type="number"
+        min="1"
+        max="1000"
+        inputmode="numeric"
+        placeholder="Total lectures"
+        style="
+          width:100%;
+          border:1px solid rgba(35,37,32,.22);
+          border-radius:10px;
+          padding:12px;
+          outline:none;
+          background:#fff;
+          margin-bottom:14px;
+        "
+      >
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:8px;
+        "
+      >
+
+        <button
+          id="modalCancel"
+          type="button"
+          style="
+            border:1px solid rgba(35,37,32,.22);
+            background:#fff;
+            border-radius:10px;
+            padding:11px;
+            cursor:pointer;
+          "
+        >
+          Cancel
+        </button>
+
+        <button
+          id="modalCreate"
+          type="button"
+          style="
+            border:0;
+            background:${subject?.color || "#232520"};
+            color:#fff;
+            border-radius:10px;
+            padding:11px;
+            cursor:pointer;
+          "
+        >
+          Add chapter
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(
+    modal
+  );
+
+  const nameInput =
+    document.getElementById(
+      "modalChapterName"
+    );
+
+  const lectureInput =
+    document.getElementById(
+      "modalLectureTotal"
+    );
+
+  const close =
+    ()=>{
+      modal.remove();
+    };
+
+  document
+    .getElementById(
+      "modalCancel"
+    )
+    .onclick =
+      close;
+
+  document
+    .getElementById(
+      "modalCreate"
+    )
+    .onclick =
+      async()=>{
+
+        const name =
+          nameInput.value.trim();
+
+        let total =
+          parseInt(
+            lectureInput.value,
+            10
+          );
+
+        if(!name){
+
+          nameInput.focus();
+
+          return;
+
+        }
+
+        if(
+          !Number.isFinite(total) ||
+          total < 1
+        ){
+
+          total = 1;
+
+        }
+
+        total =
+          Math.min(
+            total,
+            1000
+          );
+
+        const yearData =
+          state.data[
+            state.subject
+          ].years[
+            state.year
+          ];
+
+        yearData.chapters.push({
+
+          id:uid(),
+
+          name,
+
+          totalLectures:
+            total,
+
+          completedLectures:
+            0,
+
+          confidence:
+            0
+
+        });
+
+        await dbSet(
+          TRACKER_KEY,
+          {
+            settings,
+            data:state.data
+          }
+        );
+
+        close();
+
+        render();
+
+      };
+
+  nameInput.addEventListener(
+    "keydown",
+    event=>{
+
+      if(
+        event.key ===
+        "Enter"
+      ){
+
+        event.preventDefault();
+
+        document
+          .getElementById(
+            "modalCreate"
+          )
+          .click();
+
+      }
+
+      if(
+        event.key ===
+        "Escape"
+      ){
+
+        close();
+
+      }
+
+    }
+  );
+
+  setTimeout(
+    ()=>{
+      nameInput.focus();
+    },
+    40
+  );
+
+}
+
+/* =========================================================
+   COMMON BINDING
+========================================================= */
+
+function bindCommon(){
+
+  const brand =
+    document.getElementById(
+      "brand"
+    );
+
+  if(brand){
+
+    brand.addEventListener(
+      "blur",
+      ()=>{
+
+        const title =
+          brand.textContent.trim();
+
+        if(title){
+
+          settings.title =
+            title;
+
+        }else{
+
+          brand.textContent =
+            settings.title;
+
+        }
+
+        save();
+
+      }
+    );
+
+    brand.addEventListener(
+      "keydown",
+      event=>{
+
+        if(
+          event.key ===
+          "Enter"
+        ){
+
+          event.preventDefault();
+
+          brand.blur();
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function render(){
+
+  const app =
+    document.getElementById(
+      "app"
+    );
+
+  if(
+    state.view ===
+    "home"
+  ){
+
+    app.innerHTML =
+      home();
+
+  }else if(
+    state.view ===
+    "subject"
+  ){
+
+    app.innerHTML =
+      subjectPage(
+        state.subject
+      );
+
+  }else if(
+    state.view ===
+    "year"
+  ){
+
+    app.innerHTML =
+      yearPage(
+        state.subject,
+        state.year
+      );
+
+  }
+
+  bindCommon();
+
+  const page =
+    app.firstElementChild;
+
+  if(page){
+
+    page.classList.remove(
+      "page-enter"
+    );
+
+    void page.offsetWidth;
+
+    page.classList.add(
+      "page-enter"
+    );
+
+  }
+
+  /* =======================================================
+     HOME
+  ======================================================= */
+
+  if(
+    state.view ===
+    "home"
+  ){
+
+    document
+      .querySelectorAll(
+        "[data-subject]"
+      )
+      .forEach(
+        button=>{
+
+          button.addEventListener(
+            "click",
+            event=>{
+
+              createRipple(
+                button,
+                event
+              );
+
+              playPop(
+                button
+              );
+
+              setTimeout(
+                ()=>{
+
+                  state.view =
+                    "subject";
+
+                  state.subject =
+                    button.dataset
+                      .subject;
+
+                  render();
+
+                },
+                160
+              );
+
+            }
+          );
+
+        }
+      );
+
+  }
+
+  /* =======================================================
+     SUBJECT
+  ======================================================= */
+
+  if(
+    state.view ===
+    "subject"
+  ){
+
+    const back =
+      document.getElementById(
+        "back"
+      );
+
+    if(back){
+
+      back.onclick =
+        event=>{
+
+          createRipple(
+            back,
+            event
+          );
+
+          state.view =
+            "home";
+
+          setTimeout(
+            render,
+            100
+          );
+
+        };
+
+    }
+
+    document
+      .querySelectorAll(
+        "[data-year]"
+      )
+      .forEach(
+        button=>{
+
+          button.addEventListener(
+            "click",
+            event=>{
+
+              createRipple(
+                button,
+                event
+              );
+
+              playPop(
+                button
+              );
+
+              setTimeout(
+                ()=>{
+
+                  state.view =
+                    "year";
+
+                  state.year =
+                    button.dataset
+                      .year;
+
+                  render();
+
+                },
+                160
+              );
+
+            }
+          );
+
+        }
+      );
+
+  }
+
+  /* =======================================================
+     YEAR
+  ======================================================= */
+
+  if(
+    state.view ===
+    "year"
+  ){
+
+    const back =
+      document.getElementById(
+        "back"
+      );
+
+    if(back){
+
+      back.onclick =
+        event=>{
+
+          createRipple(
+            back,
+            event
+          );
+
+          state.view =
+            "subject";
+
+          setTimeout(
+            render,
+            100
+          );
+
+        };
+
+    }
+
+    const addButton =
+      document.getElementById(
+        "addChapterButton"
+      );
+
+    if(addButton){
+
+      addButton.onclick =
+        event=>{
+
+          createRipple(
+            addButton,
+            event
+          );
+
+          playPop(
+            addButton
+          );
+
+          setTimeout(
+            createChapterModal,
+            130
+          );
+
+        };
+
+    }
+
+    const chapters =
+      document.querySelector(
+        ".chapters"
+      );
+
+    if(chapters){
+
+      chapters.addEventListener(
+        "click",
+        async event=>{
+
+          const button =
+            event.target.closest(
+              "[data-action]"
+            );
+
+          if(!button){
+
+            return;
+
+          }
+
+          const chapter =
+            state.data[
+              state.subject
+            ]?.years?.[
+              state.year
+            ]?.chapters?.find(
+              item =>
+                item.id ===
+                button.dataset.id
+            );
+
+          if(!chapter){
+
+            return;
+
+          }
+
+          const action =
+            button.dataset.action;
+
+          /* -----------------------------------------------
+             LECTURE
+          ----------------------------------------------- */
+
+          if(
+            action ===
+            "lecture"
+          ){
+
+            const index =
+              Number(
+                button.dataset.index
+              );
+
+            /*
+              Original click behaviour:
+              clicking the next lecture advances
+              progress; clicking the current last
+              completed lecture toggles it back.
+            */
+
+            if(
+              index + 1 ===
+              chapter.completedLectures
+            ){
+
+              chapter.completedLectures =
+                index;
+
+            }else{
+
+              chapter.completedLectures =
+                index + 1;
+
+            }
+
+            chapter.completedLectures =
+              Math.min(
+                chapter.completedLectures,
+                chapter.totalLectures
+              );
+
+            save();
+
+            updateChapterCard(
+              button.closest(
+                ".chapter"
+              ),
+              chapter
+            );
+
+            updateVisibleStats();
+
+            return;
+
+          }
+
+          /* -----------------------------------------------
+             CONFIDENCE
+          ----------------------------------------------- */
+
+          if(
+            action ===
+            "confidence"
+          ){
+
+            const value =
+              Number(
+                button.dataset.value
+              );
+
+            chapter.confidence =
+              chapter.confidence ===
+              value
+                ? 0
+                : value;
+
+            save();
+
+            updateChapterCard(
+              button.closest(
+                ".chapter"
+              ),
+              chapter
+            );
+
+            updateVisibleStats();
+
+            return;
+
+          }
+
+          /* -----------------------------------------------
+             RENAME
+          ----------------------------------------------- */
+
+          if(
+            action ===
+            "rename"
+          ){
+
+            const name =
+              prompt(
+                "Rename chapter:",
+                chapter.name
+              );
+
+            if(
+              name ===
+              null
+            ){
+
+              return;
+
+            }
+
+            const clean =
+              name.trim();
+
+            if(!clean){
+
+              return;
+
+            }
+
+            chapter.name =
+              clean;
+
+            save();
+
+            render();
+
+            return;
+
+          }
+
+          /* -----------------------------------------------
+             EDIT TOTAL
+          ----------------------------------------------- */
+
+          if(
+            action ===
+            "edit-total"
+          ){
+
+            const raw =
+              prompt(
+                "Total lectures:",
+                chapter.totalLectures
+              );
+
+            if(
+              raw ===
+              null
+            ){
+
+              return;
+
+            }
+
+            const total =
+              parseInt(
+                raw,
+                10
+              );
+
+            if(
+              !Number.isFinite(total) ||
+              total < 1
+            ){
+
+              return;
+
+            }
+
+            chapter.totalLectures =
+              Math.min(
+                total,
+                1000
+              );
+
+            chapter.completedLectures =
+              Math.min(
+                chapter.completedLectures,
+                chapter.totalLectures
+              );
+
+            save();
+
+            render();
+
+            return;
+
+          }
+
+          /* -----------------------------------------------
+             DELETE
+          ----------------------------------------------- */
+
+          if(
+            action ===
+            "delete"
+          ){
+
+            if(
+              !confirm(
+                "Delete this chapter?"
+              )
+            ){
+
+              return;
+
+            }
+
+            state.data[
+              state.subject
+            ].years[
+              state.year
+            ].chapters =
+              state.data[
+                state.subject
+              ].years[
+                state.year
+              ].chapters.filter(
+                item =>
+                  item.id !==
+                  chapter.id
+              );
+
+            save();
+
+            render();
+
+          }
+
+        }
+      );
+
+    }
+
+  }
+
+}
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+function setupSettings(){
+
+  const settingsButton =
+    document.createElement(
+      "button"
+    );
+
+  settingsButton.type =
+    "button";
+
+  settingsButton.textContent =
+    "⚙";
+
+  settingsButton.setAttribute(
+    "aria-label",
+    "Settings"
+  );
+
+  settingsButton.style.cssText = `
+
+    position:fixed;
+    right:16px;
+    top:max(16px,env(safe-area-inset-top));
+    z-index:40;
+
+    width:42px;
+    height:42px;
+
+    border:1px solid rgba(35,37,32,.20);
+    border-radius:12px;
+
+    background:rgba(255,253,247,.90);
+
+    color:#232520;
+
+    box-shadow:0 7px 20px rgba(35,37,32,.08);
+
+    cursor:pointer;
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+  `;
+
+  document.body.appendChild(
+    settingsButton
+  );
+
+  settingsButton.onclick =
+    ()=>{
+
+      document
+        .getElementById(
+          "settingsPanel"
+        )
+        .classList.add(
+          "open"
+        );
+
+    };
+
+  document
+    .getElementById(
+      "settingsPanel"
+    )
+    .addEventListener(
+      "click",
+      event=>{
+
+        if(
+          event.target.id ===
+          "settingsPanel"
+        ){
+
+          event.currentTarget
+            .classList.remove(
+              "open"
+            );
+
+        }
+
+      }
+    );
+
+  document
+    .getElementById(
+      "bgBtn"
+    )
+    .onclick =
+      ()=>{
+
+        document
+          .getElementById(
+            "bgFile"
+          )
+          .click();
+
+      };
+
+  document
+    .getElementById(
+      "clearBg"
+    )
+    .onclick =
+      async()=>{
+
+        state.background =
+          null;
+
+        applyBackground();
+
+        await dbDelete(
+          BACKGROUND_KEY
+        );
+
+      };
+
+  document
+    .getElementById(
+      "export"
+    )
+    .onclick =
+      exportData;
+
+  document
+    .getElementById(
+      "import"
+    )
+    .onclick =
+      ()=>{
+
+        document
+          .getElementById(
+            "importFile"
+          )
+          .click();
+
+      };
+
+  document
+    .getElementById(
+      "reset"
+    )
+    .onclick =
+      resetAll;
+
+}
+
+/* =========================================================
+   IMPORT FILE
+========================================================= */
+
+document
+  .getElementById(
+    "importFile"
+  )
+  .addEventListener(
+    "change",
+    event=>{
+
+      const file =
+        event.target.files?.[0];
+
+      if(file){
+
+        importData(
+          file
+        );
+
+      }
+
+      event.target.value =
+        "";
+
+    }
+  );
+
+/* =========================================================
+   BACKGROUND FILE
+========================================================= */
+
+document
+  .getElementById(
+    "bgFile"
+  )
+  .addEventListener(
+    "change",
+    event=>{
+
+      const file =
+        event.target.files?.[0];
+
+      if(!file){
+
+        return;
+
+      }
+
+      const reader =
+        new FileReader();
+
+      reader.onload =
+        readerEvent=>{
+
+          const image =
+            new Image();
+
+          image.onload =
+            async()=>{
+
+              /*
+                Resize large iPhone photos so
+                IndexedDB doesn't get hammered
+                by a gigantic base64 image.
+              */
+
+              const maxSize =
+                1800;
+
+              const scale =
+                Math.min(
+                  1,
+                  maxSize /
+                  image.width
+                );
+
+              const canvas =
+                document.createElement(
+                  "canvas"
+                );
+
+              canvas.width =
+                Math.round(
+                  image.width *
+                  scale
+                );
+
+              canvas.height =
+                Math.round(
+                  image.height *
+                  scale
+                );
+
+              const context =
+                canvas.getContext(
+                  "2d"
+                );
+
+              context.drawImage(
+                image,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+              );
+
+              state.background =
+                canvas.toDataURL(
+                  "image/jpeg",
+                  .80
+                );
+
+              applyBackground();
+
+              try{
+
+                await dbSet(
+                  BACKGROUND_KEY,
+                  state.background
+                );
+
+              }catch(error){
+
+                console.error(
+                  error
+                );
+
+                alert(
+                  "That image could not be saved. Try a smaller photo."
+                );
+
+              }
+
+            };
+
+          image.src =
+            readerEvent.target.result;
+
+        };
+
+      reader.readAsDataURL(
+        file
+      );
+
+      event.target.value =
+        "";
+
+    }
+  );
+
+/* =========================================================
+   PERSISTENT STORAGE
+========================================================= */
+
+async function requestPersistentStorage(){
+
+  try{
+
+    if(
+      navigator.storage &&
+      navigator.storage.persist
+    ){
+
+      await navigator.storage.persist();
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Persistent storage request unavailable.",
+      error
+    );
+
+  }
+
+}
+
+/* =========================================================
+   SERVICE WORKER
+========================================================= */
+
+if(
+  "serviceWorker" in
+  navigator
+){
+
+  window.addEventListener(
+    "load",
+    ()=>{
+
+      navigator.serviceWorker
+        .register(
+          "./service-worker.js"
+        )
+        .catch(
+          error=>{
+
+            console.warn(
+              "Service worker registration failed.",
+              error
+            );
+
+          }
+        );
+
+    }
+  );
+
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+
+(async function init(){
+
+  try{
+
+    await openDatabase();
+
+    await requestPersistentStorage();
+
+    await load();
+
+    applyBackground();
+
+    setupSettings();
+
+    render();
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+    document
+      .getElementById(
+        "app"
+      )
+      .innerHTML = `
+
+        <div class="empty">
+
+          <strong>
+            Could not open Study Tracker.
+          </strong>
+
+          <br><br>
+
+          Please reload the page.
+
+        </div>
+
+      `;
+
+  }
+
+})();
+
+</script>
+
+</body>
+</html>
