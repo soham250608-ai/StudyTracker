@@ -1,19 +1,9 @@
 {
   "name": "Study Tracker",
   "short_name": "Study Tracker",
-  "description": "Personal offline study tracker",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
-  "background_color": "#f4f2ea",
-  "theme_color": "#f4f2ea",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "./icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "any",
-      "purpose": "any"
-    }
-  ]
+  "background_color": "#f4efe4",
+  "theme_color": "#f4efe4",
+  "icons": []
 }
