@@ -1,6 +1,13 @@
 {
   "name": "Study Tracker",
   "short_name": "Study Tracker",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
   "description": "Local study tracker for Physics, Maths, Chemistry and Biology.",
   "start_url": "./",
   "scope": "./",
